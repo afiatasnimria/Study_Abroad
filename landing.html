@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScholarshipHunt — Find Scholarships Without the Scams</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050d0e;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08);
+  --border-glow: rgba(52,211,153,0.25);
+  --text: #f0f4f3;
+  --muted: rgba(240,244,243,0.5);
+  --subtle: rgba(240,244,243,0.28);
+  --green: #34d399;
+  --green-dim: rgba(52,211,153,0.15);
+  --green-glow: rgba(52,211,153,0.08);
+  --amber: #fbbf24;
+  --blue: #60a5fa;
+  --red: #f87171;
+  --font-display: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  font-size: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ─── NOISE TEXTURE ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* ─── AMBIENT LIGHT SYSTEM ─── */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.orb-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(52,211,153,0.18) 0%, transparent 70%);
+  top: -150px; left: 50%;
+  transform: translateX(-20%);
+  animation: orbPulse 8s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%);
+  top: 100px; right: -100px;
+  animation: orbPulse 10s ease-in-out infinite reverse;
+}
+
+.orb-3 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+  animation: orbPulse 12s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1) translateX(-20%); }
+  50% { opacity: 1; transform: scale(1.08) translateX(-20%); }
+}
+
+.orb-1 { animation: orbPulse1 8s ease-in-out infinite; }
+@keyframes orbPulse1 {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 68px;
+  background: rgba(5,13,14,0.72);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s;
+}
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-display);
+  font-size: 1.125rem; font-weight: 800;
+  letter-spacing: -0.5px;
+  text-decoration: none; color: var(--text);
+}
+
+.nav-logo-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: linear-gradient(135deg, #059669, #34d399);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+
+.nav-links {
+  display: flex; align-items: center; gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.875rem; font-weight: 400; color: var(--muted);
+  text-decoration: none; transition: color 0.2s;
+  letter-spacing: 0.01em;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.nav-actions { display: flex; align-items: center; gap: 12px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 20px; border-radius: 100px;
+  font-family: var(--font-body);
+  font-size: 0.8125rem; font-weight: 500;
+  cursor: pointer; border: 1px solid transparent;
+  transition: all 0.2s; text-decoration: none;
+}
+
+.btn-ghost {
+  background: transparent; color: var(--muted);
+  border-color: var(--border);
+}
+.btn-ghost:hover { background: var(--surface); color: var(--text); }
+
+.btn-primary {
+  background: #059669; color: #fff;
+  border-color: rgba(52,211,153,0.4);
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background: #047857;
+  box-shadow: 0 0 24px rgba(52,211,153,0.3);
+  transform: translateY(-1px);
+}
+
+/* ─── HERO SECTION ─── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 120px 48px 80px;
+  overflow: hidden;
+}
+
+.hero-grid {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+  position: relative; z-index: 1; width: 100%;
+}
+
+/* ─── HERO LEFT ─── */
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green-dim); border: 1px solid var(--border-glow);
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 0.6875rem; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--green); margin-bottom: 28px;
+}
+
+.eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: blinkDot 2.5s ease-in-out infinite;
+}
+@keyframes blinkDot {
+  0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 5.5vw, 72px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.hero-title .accent {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+  font-style: italic;
+}
+
+.hero-desc {
+  font-size: 1.125rem; font-weight: 300; line-height: 1.75;
+  color: var(--muted); margin-bottom: 40px; max-width: 480px;
+}
+
+.search-wrapper {
+  display: flex; align-items: center; gap: 0;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 6px 6px 6px 18px;
+  margin-bottom: 20px;
+  transition: all 0.22s;
+}
+
+.search-wrapper:focus-within {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 0 4px rgba(52,211,153,0.08);
+}
+
+.search-wrapper input {
+  flex: 1; border: none; background: transparent;
+  font-family: var(--font-body); font-size: 0.875rem; color: var(--text);
+  outline: none;
+}
+
+.search-wrapper input::placeholder { color: var(--subtle); }
+
+.search-wrapper .search-btn {
+  padding: 10px 20px; border-radius: 10px;
+  background: #059669; color: #fff; border: none;
+  font-family: var(--font-body); font-size: 0.8125rem;
+  font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-wrapper .search-btn:hover { background: #047857; }
+
+.quick-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px;
+}
+
+.quick-tag {
+  padding: 5px 12px; border-radius: 100px;
+  background: var(--surface); border: 1px solid var(--border);
+  font-size: 0.75rem; color: var(--muted); cursor: pointer;
+  transition: all 0.18s;
+}
+.quick-tag:hover {
+  background: var(--green-dim); border-color: var(--border-glow);
+  color: var(--green);
+}
+
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn-hero-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 28px; border-radius: 100px;
+  background: linear-gradient(135deg, #059669, #047857);
+  color: #fff; font-family: var(--font-body);
+  font-size: 0.9375rem; font-weight: 600; border: none;
+  cursor: pointer; transition: all 0.2s;
+  border: 1px solid rgba(52,211,153,0.3);
+}
+.btn-hero-primary:hover {
+  box-shadow: 0 0 32px rgba(52,211,153,0.4);
+  transform: translateY(-2px);
+}
+
+.btn-hero-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 24px; border-radius: 100px;
+  background: var(--surface); color: var(--muted);
+  font-family: var(--font-body); font-size: 0.9375rem;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-hero-ghost:hover { background: var(--surface-hover); color: var(--text); }
+
+/* ─── CAROUSEL ─── */
+.carousel-container {
+  position: relative;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.carousel-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.carousel-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.6875rem; font-weight: 600;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--subtle);
+}
+
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); position: relative;
+}
+.live-dot::after {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: 50%; border: 1px solid var(--green);
+  animation: livePulse 2s ease-out infinite;
+}
+@keyframes livePulse {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+.carousel-nav { display: flex; gap: 6px; }
+
+.carousel-nav-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 0.875rem; transition: all 0.2s;
+}
+.carousel-nav-btn:hover {
+  background: var(--green-dim); border-color: var(--border-glow);
+  color: var(--green);
+}
+
+/* ─── CARD WINDOW ─── */
+.card-window {
+  position: relative;
+  height: 360px;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.scholarship-card {
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px;
+  padding: 26px 28px;
+  display: flex; flex-direction: column; gap: 0;
+  transition: opacity 0.42s cubic-bezier(0.4,0,0.2,1),
+              transform 0.42s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* card inner glow based on accent */
+.scholarship-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-glow, rgba(52,211,153,0.4)), transparent);
+  border-radius: 20px 20px 0 0;
+}
+
+.card-state-visible { opacity: 1; transform: translateY(0) scale(1); }
+.card-state-exit-up { opacity: 0; transform: translateY(-48px) scale(0.96); }
+.card-state-exit-down { opacity: 0; transform: translateY(48px) scale(0.96); }
+.card-state-enter-up { opacity: 0; transform: translateY(48px) scale(0.96); }
+.card-state-enter-down { opacity: 0; transform: translateY(-48px) scale(0.96); }
+
+.card-top-row {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; margin-bottom: 20px;
+}
+
+.card-flag-wrap {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.card-flag {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+}
+
+.card-title-block { }
+.card-name {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 700; color: var(--text);
+  line-height: 1.3; margin-bottom: 4px;
+}
+.card-country {
+  font-size: 0.75rem; color: var(--muted);
+}
+
+.card-badges { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+
+.badge {
+  padding: 3px 10px; border-radius: 100px;
+  font-size: 0.625rem; font-weight: 700; letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.badge-verified {
+  background: rgba(52,211,153,0.15);
+  border: 1px solid rgba(52,211,153,0.3);
+  color: #34d399;
+}
+.badge-tag {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted);
+}
+.badge-urgent {
+  background: rgba(248,113,113,0.15);
+  border: 1px solid rgba(248,113,113,0.3);
+  color: #f87171;
+}
+
+/* ─── CARD STATS ─── */
+.card-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; margin-bottom: 18px;
+}
+
+.card-stat {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 11px; padding: 11px 12px;
+}
+
+.stat-label {
+  font-size: 0.625rem; color: var(--subtle);
+  font-weight: 500; margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 0.8125rem; font-weight: 600; color: var(--text);
+  line-height: 1.2;
+}
+
+/* ─── DEADLINE BAR ─── */
+.deadline-block {
+  background: rgba(251,191,36,0.06);
+  border: 1px solid rgba(251,191,36,0.15);
+  border-radius: 12px; padding: 13px 16px; margin-bottom: 18px;
+}
+
+.deadline-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.deadline-label { font-size: 0.625rem; color: var(--subtle); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.deadline-badge {
+  font-size: 0.625rem; font-weight: 700; border-radius: 100px;
+  padding: 2px 9px;
+}
+.deadline-badge.urgent {
+  background: rgba(248,113,113,0.15);
+  border: 1px solid rgba(248,113,113,0.25);
+  color: #f87171;
+}
+.deadline-badge.normal {
+  background: rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.2);
+  color: #fbbf24;
+}
+
+.deadline-date {
+  font-family: var(--font-display);
+  font-size: 1.0625rem; font-weight: 700; color: #fbbf24;
+  margin-bottom: 10px;
+}
+
+.progress-track {
+  height: 3px; border-radius: 100px;
+  background: rgba(255,255,255,0.07); overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  transition: width 0.5s ease;
+  animation: progressLoad 3.8s linear forwards;
+}
+
+@keyframes progressLoad {
+  from { width: 0; } to { width: 100%; }
+}
+
+/* ─── CARD ACTIONS ─── */
+.card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
+
+.card-btn-primary {
+  flex: 1; padding: 11px; border-radius: 11px;
+  background: #059669; color: #fff; border: none;
+  font-family: var(--font-body); font-size: 0.8125rem;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.2px;
+}
+.card-btn-primary:hover {
+  background: #047857;
+  box-shadow: 0 0 20px rgba(52,211,153,0.3);
+}
+
+.card-btn-ghost {
+  padding: 11px 16px; border-radius: 11px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); font-family: var(--font-body);
+  font-size: 0.8125rem; cursor: pointer; transition: all 0.2s;
+}
+.card-btn-ghost:hover { background: var(--surface-hover); color: var(--text); }
+
+/* ─── DOTS ─── */
+.carousel-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.carousel-dots { display: flex; gap: 6px; align-items: center; }
+
+.dot {
+  border-radius: 100px; border: none; padding: 0;
+  cursor: pointer; transition: all 0.3s ease;
+  background: rgba(255,255,255,0.2);
+}
+.dot.active {
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(52,211,153,0.5);
+}
+
+.carousel-counter {
+  font-size: 0.6875rem; color: var(--subtle); font-weight: 500;
+}
+
+/* ─── UPCOMING TRAY ─── */
+.upcoming-tray {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 18px;
+}
+
+.tray-label {
+  font-size: 0.625rem; font-weight: 600; color: var(--subtle);
+  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
+}
+
+.tray-items { display: flex; flex-direction: column; gap: 10px; }
+
+.tray-item {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; transition: opacity 0.2s;
+  padding: 2px 0;
+}
+.tray-item:hover { opacity: 0.8; }
+
+.tray-flag { font-size: 1rem; }
+
+.tray-info { flex: 1; }
+.tray-name { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+.tray-deadline { font-size: 0.6875rem; color: var(--subtle); }
+
+.tray-badge {
+  font-size: 0.625rem; padding: 2px 9px; border-radius: 100px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  color: var(--subtle);
+}
+
+/* ─── DIVIDER LINE ─── */
+.hero-line {
+  position: absolute; bottom: 0; left: 48px; right: 48px;
+  height: 1px; background: var(--border);
+}
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  position: relative; z-index: 1;
+  background: rgba(255,255,255,0.025);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+}
+
+.stats-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+}
+
+.stat-cell {
+  padding: 36px 32px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.stat-cell:last-child { border-right: none; }
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6.5vw, 4.5rem);
+  font-weight: 800;
+  background: linear-gradient(180deg, var(--text) 0%, rgba(240,244,243,0.6) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1.5px; line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 0.8125rem; color: var(--subtle); font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* ─── FEATURES ─── */
+.section {
+  position: relative; z-index: 1;
+  padding: 100px 48px;
+}
+
+.section-inner { max-width: 1280px; margin: 0 auto; }
+
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green-dim); border: 1px solid var(--border-glow);
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 0.6875rem; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--green); margin-bottom: 20px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4.5vw, 56px);
+  font-weight: 800; letter-spacing: -1.5px;
+  line-height: 1.1; color: var(--text);
+  margin-bottom: 16px;
+}
+
+.section-desc {
+  font-size: 1.0625rem; color: var(--muted); line-height: 1.75;
+  max-width: 560px; font-weight: 300;
+}
+
+.section-header { text-align: center; margin-bottom: 60px; }
+.section-header .section-desc { margin: 0 auto; }
+
+/* ─── FEATURE GRID ─── */
+.features-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.feature-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 18px; padding: 28px;
+  transition: all 0.25s; cursor: default;
+  position: relative; overflow: hidden;
+}
+.feature-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 18px;
+  background: radial-gradient(circle at 30% 20%, rgba(52,211,153,0.06) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.feature-card:hover { border-color: rgba(52,211,153,0.2); transform: translateY(-4px); }
+.feature-card:hover::after { opacity: 1; }
+
+.feature-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: var(--green-dim); border: 1px solid rgba(52,211,153,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.375rem; margin-bottom: 18px;
+}
+
+.feature-title {
+  font-family: var(--font-display);
+  font-size: 1.0625rem; font-weight: 700; color: var(--text);
+  margin-bottom: 10px;
+}
+
+.feature-desc {
+  font-size: 0.9375rem; color: var(--muted); line-height: 1.7; font-weight: 300;
+}
+
+.feature-link {
+  display: flex; align-items: center; gap: 4px;
+  margin-top: 18px; font-size: 0.8125rem; font-weight: 600;
+  color: var(--green); cursor: pointer;
+  text-decoration: none;
+}
+
+/* ─── SEARCH DEMO ─── */
+.two-col {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+}
+
+.two-col.reverse { direction: rtl; }
+.two-col.reverse > * { direction: ltr; }
+
+.demo-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px;
+  position: relative; overflow: hidden;
+}
+
+.demo-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(52,211,153,0.3), transparent);
+}
+
+.filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+
+.fchip {
+  padding: 6px 14px; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 500; cursor: pointer;
+  transition: all 0.18s; border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-family: var(--font-body);
+}
+.fchip:hover { border-color: rgba(52,211,153,0.3); color: var(--green); }
+.fchip.factive {
+  background: var(--green-dim); border-color: var(--border-glow);
+  color: var(--green);
+}
+
+.select-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
+}
+
+.demo-select {
+  padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04); color: var(--text);
+  font-family: var(--font-body); font-size: 0.8125rem;
+  cursor: pointer; outline: none;
+  appearance: none;
+}
+
+.result-row {
+  display: flex; align-items: center; padding: 14px 0; gap: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.result-row:last-of-type { border-bottom: none; }
+
+.result-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: var(--green-dim); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 1.125rem; flex-shrink: 0;
+}
+
+.result-info { flex: 1; }
+.result-name { font-size: 0.875rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.result-sub { font-size: 0.75rem; color: var(--subtle); }
+
+.result-match { text-align: right; }
+.result-pct { font-size: 0.875rem; font-weight: 700; color: var(--green); }
+.result-pct-label { font-size: 0.6875rem; color: var(--subtle); }
+
+.demo-footer {
+  margin-top: 16px; padding: 12px; border-radius: 12px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  text-align: center; font-size: 0.8125rem; color: var(--muted);
+  cursor: pointer; transition: all 0.2s;
+}
+.demo-footer:hover { border-color: rgba(52,211,153,0.2); color: var(--green); }
+
+/* ─── AGENCY DARK SECTION ─── */
+.agency-section {
+  position: relative; z-index: 1;
+  background: linear-gradient(180deg, transparent 0%, rgba(5,150,105,0.04) 50%, transparent 100%);
+  padding: 100px 48px;
+  overflow: hidden;
+}
+
+.agency-orb {
+  position: absolute; width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(52,211,153,0.07) 0%, transparent 65%);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  pointer-events: none; filter: blur(60px);
+}
+
+.verify-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px;
+  backdrop-filter: blur(20px);
+  position: relative;
+}
+
+.verify-input-row {
+  display: flex; gap: 10px; margin-bottom: 20px;
+}
+
+.verify-input {
+  flex: 1; padding: 12px 16px; border-radius: 11px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05); color: var(--text);
+  font-family: var(--font-body); font-size: 0.875rem; outline: none;
+  transition: all 0.22s;
+}
+.verify-input:focus {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 0 4px rgba(52,211,153,0.08);
+}
+.verify-input::placeholder { color: var(--subtle); }
+
+.verify-btn {
+  padding: 12px 20px; border-radius: 11px;
+  background: var(--green); color: #fff; border: none;
+  font-family: var(--font-body); font-size: 0.8125rem;
+  font-weight: 700; cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
+}
+.verify-btn:hover { background: #059669; box-shadow: 0 0 20px rgba(52,211,153,0.35); }
+
+.verify-result {
+  border-radius: 14px; padding: 18px; margin-bottom: 12px;
+}
+.verify-result.success {
+  background: rgba(52,211,153,0.06);
+  border: 1px solid rgba(52,211,153,0.2);
+}
+.verify-result.danger {
+  background: rgba(248,113,113,0.06);
+  border: 1px solid rgba(248,113,113,0.2);
+}
+
+.verify-result-top {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.verify-result-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.verify-result.success .verify-result-icon { background: rgba(52,211,153,0.12); }
+.verify-result.danger .verify-result-icon { background: rgba(248,113,113,0.12); }
+
+.verify-result-name { font-size: 0.875rem; font-weight: 700; }
+.verify-result.success .verify-result-name { color: var(--green); }
+.verify-result.danger .verify-result-name { color: #f87171; }
+
+.verify-result-sub { font-size: 0.75rem; color: var(--subtle); }
+
+.verify-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.verify-stat {
+  background: rgba(255,255,255,0.04);
+  border-radius: 9px; padding: 10px 12px;
+}
+.v-label { font-size: 0.625rem; color: var(--subtle); margin-bottom: 3px; }
+.v-value { font-size: 0.8125rem; font-weight: 600; color: var(--text); }
+
+.benefit-row {
+  display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px;
+}
+.benefit-icon { color: var(--green); font-size: 1.125rem; flex-shrink: 0; margin-top: 2px; }
+.benefit-title { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+.benefit-desc { font-size: 0.8125rem; color: var(--subtle); }
+
+/* ─── TESTIMONIALS ─── */
+.testi-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+
+.testi-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px;
+  transition: all 0.25s;
+}
+.testi-card:hover {
+  border-color: rgba(52,211,153,0.15);
+  transform: translateY(-3px);
+}
+
+.testi-quote {
+  font-size: clamp(1.75rem, 5vw, 1.75rem);
+  color: rgba(52,211,153,0.25);
+  font-family: serif; line-height: 1; margin-bottom: 14px;
+}
+
+.testi-text {
+  font-size: 1rem; color: var(--muted); line-height: 1.75;
+  font-weight: 300; margin-bottom: 24px;
+}
+
+.testi-footer {
+  display: flex; align-items: center; gap: 12px;
+  padding-top: 18px; border-top: 1px solid var(--border);
+}
+
+.testi-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+
+.testi-name { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+.testi-route { font-size: 0.75rem; color: var(--subtle); }
+
+/* ─── CTA ─── */
+.cta-section {
+  position: relative; z-index: 1;
+  padding: 100px 48px; text-align: center;
+  overflow: hidden;
+}
+
+.cta-glow {
+  position: absolute; width: 800px; height: 400px;
+  background: radial-gradient(ellipse, rgba(52,211,153,0.1) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  pointer-events: none; filter: blur(40px);
+}
+
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 5.5vw, 68px);
+  font-weight: 800; letter-spacing: -2px;
+  line-height: 1.1; color: var(--text); margin-bottom: 20px;
+}
+.cta-title em {
+  font-style: italic; color: var(--green);
+}
+
+.cta-desc {
+  font-size: 1.125rem; color: var(--muted); font-weight: 300;
+  line-height: 1.7; max-width: 480px; margin: 0 auto 40px;
+}
+
+.cta-buttons {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.cta-note { font-size: 0.8125rem; color: var(--subtle); }
+
+/* ─── FOOTER ─── */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 60px 48px 40px;
+}
+
+.footer-inner { max-width: 1280px; margin: 0 auto; }
+
+.footer-top {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px; margin-bottom: 48px;
+}
+
+.footer-brand-desc {
+  font-size: 0.8125rem; color: var(--subtle); line-height: 1.7;
+  max-width: 280px; margin-top: 14px; font-weight: 300;
+}
+
+.footer-col-title {
+  font-size: 0.6875rem; font-weight: 600; color: var(--subtle);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
+}
+
+.footer-link {
+  display: block; font-size: 0.8125rem; color: rgba(240,244,243,0.35);
+  text-decoration: none; margin-bottom: 10px; transition: color 0.2s;
+}
+.footer-link:hover { color: var(--muted); }
+
+.footer-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  padding-top: 28px; border-top: 1px solid var(--border);
+}
+
+.footer-copy { font-size: 0.75rem; color: rgba(240,244,243,0.22); }
+
+.footer-socials { display: flex; gap: 20px; }
+.footer-social {
+  font-size: 0.75rem; color: rgba(240,244,243,0.28);
+  cursor: pointer; text-decoration: none; transition: color 0.2s;
+}
+.footer-social:hover { color: var(--muted); }
+
+/* ─── TRACKER ─── */
+.tracker-panel {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border); border-radius: 20px;
+  padding: 32px;
+}
+
+.tracker-progress-row {
+  display: flex; align-items: flex-start; gap: 0;
+  margin-bottom: 36px; position: relative;
+}
+
+.tracker-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
+
+.tracker-line {
+  position: absolute; top: 16px; left: 50%; right: -50%;
+  height: 1px; z-index: 0;
+  transition: all 0.5s;
+}
+.tracker-step:last-child .tracker-line { display: none; }
+
+.step-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  position: relative; z-index: 1; transition: all 0.3s;
+}
+.step-dot.done {
+  background: var(--green-dim); border: 1px solid rgba(52,211,153,0.4);
+  color: var(--green);
+}
+.step-dot.current {
+  background: rgba(96,165,250,0.15); border: 1px solid rgba(96,165,250,0.4);
+  color: var(--blue); box-shadow: 0 0 16px rgba(96,165,250,0.2);
+}
+.step-dot.pending {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  color: var(--subtle);
+}
+.step-label { font-size: 0.6875rem; color: var(--subtle); font-weight: 500; text-align: center; }
+
+.active-stage {
+  background: rgba(96,165,250,0.06);
+  border: 1px solid rgba(96,165,250,0.2);
+  border-left: 3px solid var(--blue);
+  border-radius: 14px; padding: 22px;
+}
+.active-stage-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.active-stage-label { font-size: 0.6875rem; color: var(--blue); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+.active-stage-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--text); }
+.active-stage-badge {
+  font-size: 0.625rem; font-weight: 700; padding: 4px 12px; border-radius: 100px;
+  background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.2); color: var(--blue);
+}
+.active-stage-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.active-cell {
+  background: rgba(255,255,255,0.04); border-radius: 11px; padding: 13px 14px;
+}
+.active-cell-label { font-size: 0.625rem; color: var(--subtle); margin-bottom: 4px; }
+.active-cell-value { font-size: 0.8125rem; font-weight: 600; color: var(--text); }
+
+/* ─── FADE IN ANIMATION ─── */
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1200px) {
+  .hero-grid, .two-col { gap: 60px; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .testi-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-top { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 900px) {
+  .hero-grid, .two-col, .features-grid, .testi-grid,
+  .footer-top { grid-template-columns: 1fr !important; }
+  nav { padding: 0 24px; }
+  .nav-links, .nav-actions { display: none; }
+  .hero, .section, .stats-bar, .agency-section, .cta-section, footer { padding-left: 24px; padding-right: 24px; }
+  .stats-inner { grid-template-columns: 1fr 1fr; }
+  .hero { padding-top: 100px; }
+  .hero-title { font-size: clamp(36px, 7vw, 60px); }
+  .section-title { font-size: clamp(30px, 5vw, 48px); }
+  .cta-title { font-size: clamp(36px, 7vw, 60px); }
+  .stat-num { font-size: clamp(2.75rem, 7vw, 4rem); }
+  .testi-quote { font-size: clamp(1.5rem, 4vw, 1.75rem); }
+}
+
+@media (max-width: 600px) {
+  nav { padding: 0 16px; height: 60px; }
+  .hero, .section, .stats-bar, .agency-section, .cta-section, footer { padding-left: 16px; padding-right: 16px; }
+  .hero { padding-top: 80px; padding-bottom: 60px; }
+  .hero-grid { gap: 40px; }
+  .hero-title { font-size: clamp(32px, 11vw, 52px); }
+  .hero-desc { font-size: 1rem; }
+  .section { padding: 60px 16px; }
+  .section-title { font-size: clamp(28px, 9vw, 42px); }
+  .cta-title { font-size: clamp(32px, 11vw, 52px); }
+  .cta-desc { font-size: 1rem; }
+  .stat-num { font-size: clamp(32px, 9vw, 42px); }
+  .features-grid { gap: 12px; }
+  .feature-card { padding: 20px; }
+  .testi-grid { gap: 12px; }
+  .testi-card { padding: 20px; }
+  .testi-quote { font-size: clamp(18px, 6vw, 24px); }
+  .footer-top { gap: 24px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .nav-logo { font-size: 1rem; }
+  .btn { font-size: 0.75rem; padding: 8px 16px; }
+  .hero-eyebrow { font-size: 0.625rem; }
+  .search-wrapper input { font-size: 0.8125rem; }
+  .quick-tag { font-size: 0.6875rem; }
+  .btn-hero-primary, .btn-hero-ghost { font-size: 0.875rem; padding: 11px 22px; }
+  .card-name { font-size: 0.9375rem; }
+  .feature-title { font-size: 1rem; }
+  .feature-desc { font-size: 0.8125rem; }
+  .testi-text { font-size: 0.875rem; }
+  .testi-name { font-size: 0.8125rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── AMBIENT ORBS ─── -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">🎓</div>
+    Scholarship<span style="color: var(--green);">Hunt</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#search">Universities</a></li>
+    <li><a href="#agencies">Agencies</a></li>
+    <li><a href="#tracker">Track Apps</a></li>
+    <li><a href="#alumni">Alumni</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <a href="#" class="btn btn-ghost">Sign In</a>
+    <a href="#" class="btn btn-primary">Get Started →</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="hero">
+  <div class="hero-grid">
+
+    <!-- LEFT -->
+    <div>
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        The Future of Scholarship Search
+      </div>
+
+      <h1 class="hero-title">
+        Find Your Dream Scholarships
+        <span class="accent">Without the Scams.</span>
+      </h1>
+
+      <p class="hero-desc">
+        A centralized platform connecting students with verified scholarships, trusted universities, and vetted agencies — zero fraud, full guidance.
+      </p>
+
+      <div class="search-wrapper">
+        <span style="font-size:18px; flex-shrink:0;">🔍</span>
+        <input type="text" id="heroSearch" placeholder="Search scholarships, universities, countries..." />
+        <button class="search-btn">Search</button>
+      </div>
+
+      <div class="quick-tags">
+        <span class="quick-tag">🇺🇸 USA</span>
+        <span class="quick-tag">🇬🇧 UK</span>
+        <span class="quick-tag">🇩🇪 Germany</span>
+        <span class="quick-tag">🇨🇦 Canada</span>
+        <span class="quick-tag">🇯🇵 Japan</span>
+      </div>
+
+      <div class="hero-ctas">
+        <button class="btn-hero-primary">Explore Scholarships →</button>
+        <button class="btn-hero-ghost">▷ &nbsp;How it Works</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: CAROUSEL -->
+    <div class="carousel-container" id="carousel">
+      <div class="carousel-header">
+        <div class="carousel-label">
+          <span class="live-dot"></span>
+          Upcoming Scholarships
+        </div>
+        <div class="carousel-nav">
+          <button class="carousel-nav-btn" id="prevBtn">↑</button>
+          <button class="carousel-nav-btn" id="nextBtn">↓</button>
+        </div>
+      </div>
+
+      <!-- MAIN CARD WINDOW -->
+      <div class="card-window">
+        <div class="scholarship-card card-state-visible" id="mainCard"></div>
+      </div>
+
+      <!-- DOTS + COUNTER -->
+      <div class="carousel-bottom">
+        <div class="carousel-dots" id="dots"></div>
+        <span class="carousel-counter" id="counter">1 / 5 scholarships</span>
+      </div>
+
+      <!-- UPCOMING TRAY -->
+      <div class="upcoming-tray">
+        <div class="tray-label">Up Next</div>
+        <div class="tray-items" id="trayItems"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── STATS ─── -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-cell reveal">
+      <div class="stat-num">12K+</div>
+      <div class="stat-label">Verified Scholarships</div>
+    </div>
+    <div class="stat-cell reveal" style="transition-delay:80ms">
+      <div class="stat-num">3,400+</div>
+      <div class="stat-label">Trusted Universities</div>
+    </div>
+    <div class="stat-cell reveal" style="transition-delay:160ms">
+      <div class="stat-num">98%</div>
+      <div class="stat-label">Scam-Free Rate</div>
+    </div>
+    <div class="stat-cell reveal" style="transition-delay:240ms">
+      <div class="stat-num">50K+</div>
+      <div class="stat-label">Students Helped</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FEATURES ─── -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <div class="section-eyebrow">Platform Features</div>
+      <h2 class="section-title">Everything to study abroad<br>safely & confidently</h2>
+      <p class="section-desc">One platform. Zero scams. Complete guidance from search to acceptance.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔍</div>
+        <div class="feature-title">Scholarship Search</div>
+        <p class="feature-desc">Filter by country, degree, subject, deadline, and funding type across 12,000+ verified listings updated daily.</p>
+        <a class="feature-link">Learn more →</a>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:60ms">
+        <div class="feature-icon">🏛️</div>
+        <div class="feature-title">University Catalog</div>
+        <p class="feature-desc">Explore rankings, tuition fees, requirements, and programs from top verified universities worldwide.</p>
+        <a class="feature-link">Learn more →</a>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:120ms">
+        <div class="feature-icon">✅</div>
+        <div class="feature-title">Agency Verification</div>
+        <p class="feature-desc">Instantly verify educational consultancy agencies before you trust them with your future and your fees.</p>
+        <a class="feature-link">Learn more →</a>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:180ms">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Smart Recommendations</div>
+        <p class="feature-desc">AI-powered matches based on your CGPA, preferred country, degree level, and academic profile.</p>
+        <a class="feature-link">Learn more →</a>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:240ms">
+        <div class="feature-icon">📋</div>
+        <div class="feature-title">Application Tracker</div>
+        <p class="feature-desc">Monitor every stage — Applied, Under Review, Interview, Accepted, or Rejected — in one dashboard.</p>
+        <a class="feature-link">Learn more →</a>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:300ms">
+        <div class="feature-icon">🎓</div>
+        <div class="feature-title">Alumni Consultation</div>
+        <p class="feature-desc">Connect with verified alumni from your target universities for mentorship and insider guidance.</p>
+        <a class="feature-link">Learn more →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SEARCH DEMO ─── -->
+<section class="section" id="search" style="padding-top:0">
+  <div class="section-inner">
+    <div class="two-col">
+      <div class="reveal">
+        <div class="section-eyebrow">Smart Search</div>
+        <h2 class="section-title">Filter thousands of<br>scholarships instantly</h2>
+        <p class="section-desc" style="margin-bottom:28px;">Our verified scholarship database is updated daily. Filter by country, degree, subject, deadline, and funding type.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px;">
+          <div class="benefit-row">
+            <div class="benefit-icon">✦</div>
+            <div><div class="benefit-title">Scam Detection</div><div class="benefit-desc">Every listing vetted by our team</div></div>
+          </div>
+          <div class="benefit-row">
+            <div class="benefit-icon">✦</div>
+            <div><div class="benefit-title">Real Deadlines</div><div class="benefit-desc">No outdated or expired scholarships</div></div>
+          </div>
+          <div class="benefit-row">
+            <div class="benefit-icon">✦</div>
+            <div><div class="benefit-title">Direct Links</div><div class="benefit-desc">Apply directly on official websites</div></div>
+          </div>
+        </div>
+        <button class="btn-hero-primary">Browse All Scholarships →</button>
+      </div>
+
+      <div class="demo-card reveal" style="transition-delay:100ms">
+        <div class="filter-row" id="filterChips">
+          <button class="fchip factive" data-f="All">All</button>
+          <button class="fchip" data-f="Fully Funded">Fully Funded</button>
+          <button class="fchip" data-f="Partial">Partial</button>
+          <button class="fchip" data-f="Government">Government</button>
+        </div>
+        <div class="select-row">
+          <select class="demo-select"><option>🌍 Any Country</option><option>🇺🇸 USA</option><option>🇬🇧 UK</option><option>🇩🇪 Germany</option><option>🇨🇦 Canada</option></select>
+          <select class="demo-select"><option>🎓 Any Degree</option><option>Bachelor's</option><option>Master's</option><option>PhD</option></select>
+        </div>
+
+        <div class="result-row">
+          <div class="result-icon">🇬🇧</div>
+          <div class="result-info"><div class="result-name">Chevening Scholarship</div><div class="result-sub">UK · Master's · Fully Funded · Nov 5, 2025</div></div>
+          <div class="result-match"><div class="result-pct">94%</div><div class="result-pct-label">match</div></div>
+        </div>
+        <div class="result-row">
+          <div class="result-icon">🇯🇵</div>
+          <div class="result-info"><div class="result-name">MEXT Scholarship</div><div class="result-sub">Japan · All Degrees · Fully Funded · May 2026</div></div>
+          <div class="result-match"><div class="result-pct">88%</div><div class="result-pct-label">match</div></div>
+        </div>
+        <div class="result-row">
+          <div class="result-icon">🇪🇺</div>
+          <div class="result-info"><div class="result-name">Erasmus Mundus 2026</div><div class="result-sub">Europe · Master's · Fully Funded · Jan 2026</div></div>
+          <div class="result-match"><div class="result-pct">82%</div><div class="result-pct-label">match</div></div>
+        </div>
+
+        <div class="demo-footer">View all 12,000+ scholarships →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TRACKER ─── -->
+<section class="section" id="tracker" style="padding-top:0">
+  <div class="section-inner">
+    <div class="section-header reveal" style="margin-bottom:48px">
+      <div class="section-eyebrow">Application Tracker</div>
+      <h2 class="section-title">Never miss a step in your journey</h2>
+    </div>
+
+    <div class="tracker-panel reveal">
+      <div class="tracker-progress-row">
+        <div class="tracker-step">
+          <div class="tracker-line" style="background:linear-gradient(90deg,rgba(52,211,153,0.4),rgba(52,211,153,0.4))"></div>
+          <div class="step-dot done">✓</div>
+          <div class="step-label">Applied</div>
+        </div>
+        <div class="tracker-step">
+          <div class="tracker-line" style="background:linear-gradient(90deg,rgba(52,211,153,0.4),rgba(96,165,250,0.3))"></div>
+          <div class="step-dot done">✓</div>
+          <div class="step-label">Under Review</div>
+        </div>
+        <div class="tracker-step">
+          <div class="tracker-line" style="background:linear-gradient(90deg,rgba(96,165,250,0.3),rgba(255,255,255,0.06))"></div>
+          <div class="step-dot current">→</div>
+          <div class="step-label">Interview</div>
+        </div>
+        <div class="tracker-step">
+          <div class="tracker-line" style="background:rgba(255,255,255,0.05)"></div>
+          <div class="step-dot pending">4</div>
+          <div class="step-label">Accepted</div>
+        </div>
+        <div class="tracker-step">
+          <div class="step-dot pending">5</div>
+          <div class="step-label">Decision</div>
+        </div>
+      </div>
+
+      <div class="active-stage">
+        <div class="active-stage-header">
+          <div>
+            <div class="active-stage-label">Current Stage</div>
+            <div class="active-stage-title">Interview Stage</div>
+          </div>
+          <span class="active-stage-badge">Action Required</span>
+        </div>
+        <div class="active-stage-grid">
+          <div class="active-cell"><div class="active-cell-label">Scholarship</div><div class="active-cell-value">DAAD 2025</div></div>
+          <div class="active-cell"><div class="active-cell-label">Interview Date</div><div class="active-cell-value" style="color:#fbbf24">Oct 28, 2025</div></div>
+          <div class="active-cell"><div class="active-cell-label">Resources Ready</div><div class="active-cell-value" style="color:var(--green)">3 prepared</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── AGENCY VERIFICATION ─── -->
+<section class="agency-section" id="agencies">
+  <div class="agency-orb"></div>
+  <div class="section-inner">
+    <div class="two-col">
+      <div class="verify-card reveal">
+        <div style="font-size:13px;font-weight:600;color:var(--subtle);text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;">Agency Verification</div>
+
+        <div class="verify-input-row">
+          <input class="verify-input" type="text" placeholder="Enter agency name or registration number..." />
+          <button class="verify-btn">Verify →</button>
+        </div>
+
+        <div class="verify-result success">
+          <div class="verify-result-top">
+            <div class="verify-result-icon">✅</div>
+            <div>
+              <div class="verify-result-name">EduPath Consultancy — VERIFIED</div>
+              <div class="verify-result-sub">Reg: BD-2019-0042 · Active since 2019</div>
+            </div>
+          </div>
+          <div class="verify-stats">
+            <div class="verify-stat"><div class="v-label">Licensed Since</div><div class="v-value">2019</div></div>
+            <div class="verify-stat"><div class="v-label">Students Served</div><div class="v-value">2,340+</div></div>
+            <div class="verify-stat"><div class="v-label">Complaint Rate</div><div class="v-value">0.2%</div></div>
+            <div class="verify-stat"><div class="v-label">Rating</div><div class="v-value">4.8 / 5</div></div>
+          </div>
+        </div>
+
+        <div class="verify-result danger">
+          <div class="verify-result-top">
+            <div class="verify-result-icon">⚠️</div>
+            <div>
+              <div class="verify-result-name">GlobalVisa Pro — NOT VERIFIED</div>
+              <div class="verify-result-sub">3 fraud reports filed. Avoid this agency.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal" style="transition-delay:100ms">
+        <div class="section-eyebrow">Agency Verification</div>
+        <h2 class="section-title">Never get scammed by fake consultancies</h2>
+        <p class="section-desc" style="margin-bottom:32px;">Before paying any consultation fee, verify the agency's credentials in seconds. Our registry flags fraudulent agencies and highlights trusted ones.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="benefit-row"><div class="benefit-icon">✦</div><div><div class="benefit-title">Government-registered agencies only</div></div></div>
+          <div class="benefit-row"><div class="benefit-icon">✦</div><div><div class="benefit-title">Real-time fraud alerts</div></div></div>
+          <div class="benefit-row"><div class="benefit-icon">✦</div><div><div class="benefit-title">Community-reported scam database</div></div></div>
+          <div class="benefit-row"><div class="benefit-icon">✦</div><div><div class="benefit-title">Official rating and complaint history</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section class="section" id="alumni">
+  <div class="section-inner">
+    <div class="section-header reveal" style="margin-bottom:48px">
+      <div class="section-eyebrow">Student Stories</div>
+      <h2 class="section-title">Real students, real results</h2>
+    </div>
+
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">I found my DAAD scholarship through ScholarshipHunt after being scammed by two fake agencies. This platform literally changed my life.</p>
+        <div class="testi-footer">
+          <div class="testi-avatar" style="background:rgba(123,63,160,0.15);color:#a78bfa">FR</div>
+          <div><div class="testi-name">Fatima Rahman</div><div class="testi-route">Bangladesh → Germany</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:80ms">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">The agency verification feature saved me from a fraudulent consultancy that took money from three of my classmates. Applied to Chevening and got in!</p>
+        <div class="testi-footer">
+          <div class="testi-avatar" style="background:rgba(27,108,168,0.15);color:#60a5fa">AS</div>
+          <div><div class="testi-name">Arjun Sharma</div><div class="testi-route">India → UK</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:160ms">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">The alumni consultation was invaluable. I talked to three UBC alumni before submitting my application and knew exactly what to expect.</p>
+        <div class="testi-footer">
+          <div class="testi-avatar" style="background:rgba(13,122,95,0.15);color:#34d399">ML</div>
+          <div><div class="testi-name">Mei Lin</div><div class="testi-route">Vietnam → Canada</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="section-eyebrow" style="margin:0 auto 24px;display:inline-flex">Your Scholarship Awaits</div>
+    <h2 class="cta-title reveal">Your scholarship<br><em>is waiting for you</em></h2>
+    <p class="cta-desc reveal">Join 50,000+ students who found verified opportunities through ScholarshipHunt — no scams, no fake agencies, just real results.</p>
+    <div class="cta-buttons reveal">
+      <button class="btn-hero-primary" style="font-size:16px;padding:15px 36px">Start for Free →</button>
+      <button class="btn-hero-ghost" style="font-size:16px;padding:15px 28px">Watch Demo</button>
+    </div>
+    <p class="cta-note reveal">Free forever · No credit card required · 12,000+ verified scholarships</p>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <a href="#" class="nav-logo" style="margin-bottom:0">
+          <div class="nav-logo-icon">🎓</div>
+          Scholarship<span style="color:var(--green)">Hunt</span>
+        </a>
+        <p class="footer-brand-desc">A trusted ecosystem for students to safely find scholarships and study abroad opportunities without scams.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Platform</div>
+        <a href="#" class="footer-link">Scholarships</a>
+        <a href="#" class="footer-link">Universities</a>
+        <a href="#" class="footer-link">Agencies</a>
+        <a href="#" class="footer-link">Track Apps</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Students</div>
+        <a href="#" class="footer-link">Register</a>
+        <a href="#" class="footer-link">Alumni Network</a>
+        <a href="#" class="footer-link">Resources</a>
+        <a href="#" class="footer-link">Blog</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <a href="#" class="footer-link">About</a>
+        <a href="#" class="footer-link">Mission</a>
+        <a href="#" class="footer-link">Privacy</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 ScholarshipHunt. Built with ReactJS, TypeScript & ❤️</div>
+      <div class="footer-socials">
+        <a href="#" class="footer-social">Twitter</a>
+        <a href="#" class="footer-social">LinkedIn</a>
+        <a href="#" class="footer-social">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const SCHOLARSHIPS = [
+  {
+    name: "DAAD Scholarship 2025",
+    flag: "🇩🇪", country: "Germany", degree: "Master's",
+    type: "Fully Funded", deadline: "Nov 15, 2025", daysLeft: 12,
+    amount: "€11,208/yr", field: "Engineering", glow: "rgba(52,211,153,0.4)",
+    tag: "Popular", tagClass: "", urgent: false
+  },
+  {
+    name: "Chevening Scholarship",
+    flag: "🇬🇧", country: "United Kingdom", degree: "Master's",
+    type: "Fully Funded", deadline: "Nov 5, 2025", daysLeft: 3,
+    amount: "£18,000/yr", field: "All Fields", glow: "rgba(248,113,113,0.35)",
+    tag: "Closing Soon", tagClass: "urgent", urgent: true
+  },
+  {
+    name: "Erasmus Mundus 2026",
+    flag: "🇪🇺", country: "Europe", degree: "Master's / PhD",
+    type: "Fully Funded", deadline: "Jan 15, 2026", daysLeft: 74,
+    amount: "€1,400/mo", field: "Multidisciplinary", glow: "rgba(96,165,250,0.35)",
+    tag: "New", tagClass: "", urgent: false
+  },
+  {
+    name: "MEXT Scholarship",
+    flag: "🇯🇵", country: "Japan", degree: "Bachelor's / Master's",
+    type: "Fully Funded", deadline: "May 26, 2026", daysLeft: 145,
+    amount: "¥117,000/mo", field: "All Fields", glow: "rgba(251,191,36,0.3)",
+    tag: "Government", tagClass: "", urgent: false
+  },
+  {
+    name: "Vanier Canada Graduate",
+    flag: "🇨🇦", country: "Canada", degree: "PhD",
+    type: "Fully Funded", deadline: "Nov 1, 2025", daysLeft: 8,
+    amount: "CA$50,000/yr", field: "Research", glow: "rgba(167,139,250,0.35)",
+    tag: "PhD Only", tagClass: "", urgent: false
+  }
+];
+
+let currentIndex = 0;
+let isAnimating = false;
+let autoTimer;
+let paused = false;
+
+const mainCard = document.getElementById('mainCard');
+const dotsEl = document.getElementById('dots');
+const counterEl = document.getElementById('counter');
+const trayEl = document.getElementById('trayItems');
+
+function renderCard(s) {
+  mainCard.style.setProperty('--card-glow', s.glow);
+  mainCard.innerHTML = `
+    <div class="card-top-row">
+      <div class="card-flag-wrap">
+        <div class="card-flag">${s.flag}</div>
+        <div class="card-title-block">
+          <div class="card-name">${s.name}</div>
+          <div class="card-country">${s.country} · ${s.degree}</div>
+        </div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-verified">VERIFIED ✓</span>
+        <span class="badge badge-tag ${s.urgent ? 'badge-urgent' : ''}">${s.tag}</span>
+      </div>
+    </div>
+
+    <div class="card-stats">
+      <div class="card-stat">
+        <div class="stat-label">Funding</div>
+        <div class="stat-value">${s.type}</div>
+      </div>
+      <div class="card-stat">
+        <div class="stat-label">Award</div>
+        <div class="stat-value">${s.amount}</div>
+      </div>
+      <div class="card-stat">
+        <div class="stat-label">Field</div>
+        <div class="stat-value">${s.field}</div>
+      </div>
+    </div>
+
+    <div class="deadline-block">
+      <div class="deadline-top">
+        <div class="deadline-label">Deadline</div>
+        <span class="deadline-badge ${s.daysLeft <= 10 ? 'urgent' : 'normal'}">${s.daysLeft} days left</span>
+      </div>
+      <div class="deadline-date">${s.deadline}</div>
+      <div class="progress-track">
+        <div class="progress-fill" key="${currentIndex}"></div>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <button class="card-btn-primary">Apply Now →</button>
+      <button class="card-btn-ghost">Save</button>
+      <button class="card-btn-ghost">↗</button>
+    </div>
+  `;
+}
+
+function renderDots() {
+  dotsEl.innerHTML = '';
+  SCHOLARSHIPS.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === currentIndex ? ' active' : '');
+    d.style.width = i === currentIndex ? '22px' : '6px';
+    d.style.height = '6px';
+    d.addEventListener('click', () => goTo(i, i > currentIndex ? 'up' : 'down'));
+    dotsEl.appendChild(d);
+  });
+}
+
+function renderTray() {
+  trayEl.innerHTML = '';
+  const upNext = SCHOLARSHIPS.filter((_, i) => i !== currentIndex).slice(0, 2);
+  upNext.forEach(s => {
+    trayEl.innerHTML += `
+      <div class="tray-item">
+        <span class="tray-flag">${s.flag}</span>
+        <div class="tray-info">
+          <div class="tray-name">${s.name}</div>
+          <div class="tray-deadline">${s.deadline}</div>
+        </div>
+        <span class="tray-badge">${s.type}</span>
+      </div>
+    `;
+  });
+}
+
+function goTo(idx, dir = 'up') {
+  if (isAnimating || idx === currentIndex) return;
+  isAnimating = true;
+
+  const exitClass = dir === 'up' ? 'card-state-exit-up' : 'card-state-exit-down';
+  const enterClass = dir === 'up' ? 'card-state-enter-up' : 'card-state-enter-down';
+
+  mainCard.className = 'scholarship-card ' + exitClass;
+
+  setTimeout(() => {
+    currentIndex = idx;
+    renderCard(SCHOLARSHIPS[currentIndex]);
+    mainCard.className = 'scholarship-card ' + enterClass;
+    counterEl.textContent = `${currentIndex + 1} / ${SCHOLARSHIPS.length} scholarships`;
+    renderDots();
+    renderTray();
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        mainCard.className = 'scholarship-card card-state-visible';
+        setTimeout(() => { isAnimating = false; }, 440);
+      });
+    });
+  }, 380);
+}
+
+function next() { goTo((currentIndex + 1) % SCHOLARSHIPS.length, 'up'); }
+function prev() { goTo((currentIndex - 1 + SCHOLARSHIPS.length) % SCHOLARSHIPS.length, 'down'); }
+
+function startAuto() {
+  clearInterval(autoTimer);
+  autoTimer = setInterval(() => { if (!paused) next(); }, 3800);
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => { next(); startAuto(); });
+document.getElementById('prevBtn').addEventListener('click', () => { prev(); startAuto(); });
+
+const carouselEl = document.getElementById('carousel');
+carouselEl.addEventListener('mouseenter', () => { paused = true; });
+carouselEl.addEventListener('mouseleave', () => { paused = false; });
+
+// Quick tags fill search
+document.querySelectorAll('.quick-tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    const txt = tag.textContent.replace(/^.{2}/,'').trim();
+    document.getElementById('heroSearch').value = txt;
+  });
+});
+
+// Filter chips
+document.querySelectorAll('.fchip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.fchip').forEach(c => c.classList.remove('factive'));
+    chip.classList.add('factive');
+  });
+});
+
+// Init
+renderCard(SCHOLARSHIPS[0]);
+renderDots();
+renderTray();
+counterEl.textContent = `1 / ${SCHOLARSHIPS.length} scholarships`;
+startAuto();
+
+// ─── SCROLL REVEAL ───
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+reveals.forEach(el => revealObs.observe(el));
+
+// NAV scroll state
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.background =
+    window.scrollY > 60 ? 'rgba(5,13,14,0.92)' : 'rgba(5,13,14,0.72)';
+});
+
+// Carousel auto-change every 5 seconds
+let currentCard = 0;
+const cards = document.querySelectorAll('.scholarship-card');
+const dots = document.querySelectorAll('.dot');
+const counter = document.querySelector('.carousel-counter');
+const navBtns = document.querySelectorAll('.carousel-nav-btn');
+
+function updateCarousel(direction = 1) {
+  // Remove active states
+  cards.forEach(card => card.classList.remove('card-state-visible'));
+  dots.forEach(dot => dot.classList.remove('active'));
+
+  // Add exit animation to current card
+  const exitClass = direction > 0 ? 'card-state-exit-up' : 'card-state-exit-down';
+  cards[currentCard].classList.add(exitClass);
+
+  // Move to next/prev card
+  currentCard = (currentCard + direction + cards.length) % cards.length;
+
+  // Add enter animation to new card
+  const enterClass = direction > 0 ? 'card-state-enter-up' : 'card-state-enter-down';
+  cards[currentCard].classList.remove('card-state-enter-up', 'card-state-enter-down');
+  cards[currentCard].classList.add('card-state-visible');
+
+  // Update dots
+  dots[currentCard].classList.add('active');
+
+  // Update counter
+  counter.textContent = `${currentCard + 1} / ${cards.length}`;
+
+  // Reset exit animation after transition
+  setTimeout(() => {
+    cards.forEach((card, index) => {
+      if (index !== currentCard) {
+        card.classList.remove('card-state-exit-up', 'card-state-exit-down');
+        card.classList.add(enterClass);
+      }
+    });
+  }, 420);
+}
+
+// Manual navigation
+navBtns[0].addEventListener('click', () => updateCarousel(-1)); // Previous
+navBtns[1].addEventListener('click', () => updateCarousel(1));  // Next
+
+// Dot navigation
+dots.forEach((dot, index) => {
+  dot.addEventListener('click', () => {
+    if (index !== currentCard) {
+      const direction = index > currentCard ? 1 : -1;
+      updateCarousel(direction);
+    }
+  });
+});
+
+// Start auto-change every 5 seconds
+setInterval(() => updateCarousel(1), 5000);
+</script>
+</body>
+</html>
