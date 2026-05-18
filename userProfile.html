@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scholarship Hunt - Student Profile</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+    body{
+      background:linear-gradient(135deg,#eef4ff,#f8fbff);
+      padding:30px;
+      color:#222;
+    }
+    .container{
+      max-width:1200px;
+      margin:auto;
+      display:grid;
+      grid-template-columns:320px 1fr;
+      gap:25px;
+    }
+    .card{
+      background:white;
+      border-radius:20px;
+      padding:25px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    }
+    .profile-header{
+      text-align:center;
+    }
+    .profile-pic{
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      object-fit:cover;
+      border:4px solid #2563eb;
+    }
+    .verified{
+      color:#2563eb;
+      font-size:20px;
+      margin-left:5px;
+    }
+    .name{
+      margin-top:15px;
+      font-size:24px;
+      font-weight:bold;
+    }
+    .goal{
+      color:#666;
+      margin-top:8px;
+    }
+    .progress-section{
+      margin-top:25px;
+    }
+    .progress-bar{
+      width:100%;
+      height:12px;
+      background:#ddd;
+      border-radius:20px;
+      overflow:hidden;
+    }
+    .progress-fill{
+      width:82%;
+      height:100%;
+      background:#2563eb;
+    }
+    .btn{
+      display:block;
+      width:100%;
+      padding:12px;
+      margin-top:20px;
+      border:none;
+      border-radius:10px;
+      background:#2563eb;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .main-grid{
+      display:grid;
+      gap:20px;
+    }
+    .section-title{
+      font-size:20px;
+      margin-bottom:15px;
+      font-weight:bold;
+    }
+    .info-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:15px;
+    }
+    .info-box{
+      background:#f7faff;
+      padding:15px;
+      border-radius:15px;
+    }
+    .tag{
+      display:inline-block;
+      background:#e0ecff;
+      padding:8px 12px;
+      border-radius:30px;
+      margin:5px;
+      font-size:14px;
+    }
+    .saved-item{
+      padding:15px;
+      background:#f8f9fc;
+      border-radius:12px;
+      margin-bottom:10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .explore-btn{
+      padding:8px 15px;
+      border:none;
+      background:#2563eb;
+      color:white;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .timeline{
+      border-left:3px solid #2563eb;
+      padding-left:20px;
+    }
+    .timeline-item{
+      margin-bottom:20px;
+    }
+    @media(max-width:900px){
+      .container{grid-template-columns:1fr;}
+      .info-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left Profile Card -->
+    <div class="card">
+      <div class="profile-header">
+        <img src="https://via.placeholder.com/120" class="profile-pic" alt="Profile">
+        <div class="name">John Carter <span class="verified">✔</span></div>
+        <p class="goal">Scholarship Seeker | Future MSc Student</p>
+      </div>
+
+      <div class="progress-section">
+        <h3>Profile Completion</h3>
+        <br>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <p style="margin-top:10px;">82% Complete</p>
+        <p style="color:green;margin-top:10px;">Complete 100% to become a Certified User</p>
+      </div>
+
+      <button class="btn">Edit Profile</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-grid">
+
+      <div class="card">
+        <div class="section-title">Academic Background</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <h4>SSC</h4>
+            <p>Science | GPA 5.00</p>
+          </div>
+          <div class="timeline-item">
+            <h4>HSC</h4>
+            <p>Science | GPA 5.00</p>
+          </div>
+          <div class="timeline-item">
+            <h4>BSc in CSE</h4>
+            <p>CGPA 3.85</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Scholarship Interests</div>
+        <div class="info-grid">
+          <div class="info-box">
+            <strong>Preferred Country</strong>
+            <p>Canada, Germany, Australia</p>
+          </div>
+          <div class="info-box">
+            <strong>Interested Course</strong>
+            <p>Masters in AI & Data Science</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Field of Interest</div>
+        <span class="tag">Machine Learning</span>
+        <span class="tag">Artificial Intelligence</span>
+        <span class="tag">Bioinformatics</span>
+        <span class="tag">Research</span>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Saved Scholarships</div>
+        <div class="saved-item">
+          <span>DAAD Scholarship</span>
+          <button class="explore-btn">Explore</button>
+        </div>
+        <div class="saved-item">
+          <span>Chevening Scholarship</span>
+          <button class="explore-btn">Explore</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Agency Connections</div>
+        <div class="saved-item">
+          <span>Global Study Agency</span>
+          <button class="explore-btn">Explore</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
